@@ -6,7 +6,7 @@ import './TaskForm.scss'
 
 interface TaskFormProps {
   categories: string[]
-  onAdd: (draft: TaskDraft) => void
+  onSubmit: (draft: TaskDraft) => void
 }
 
 const EMPTY_DRAFT: TaskDraft = {
@@ -18,7 +18,7 @@ const EMPTY_DRAFT: TaskDraft = {
 
 const DEFAULT_CATEGORY = 'Загальне'
 
-function TaskForm({ categories, onAdd }: TaskFormProps) {
+function TaskForm({ categories, onSubmit }: TaskFormProps) {
   const [draft, setDraft] = useState<TaskDraft>(EMPTY_DRAFT)
   const [error, setError] = useState<string | null>(null)
   const id = useId()
@@ -35,7 +35,7 @@ function TaskForm({ categories, onAdd }: TaskFormProps) {
       setError('Введіть назву завдання.')
       return
     }
-    onAdd({
+    onSubmit({
       title,
       description: draft.description.trim(),
       category: draft.category.trim() || DEFAULT_CATEGORY,

@@ -1,15 +1,15 @@
-import type { TaskFilter } from '../../types/task'
-import { FILTERS, FILTER_LABELS } from '../../utils/tasks'
+import { useTaskContext } from '../../hooks/useTaskContext'
+import { FILTERS, FILTER_LABELS, countTasks } from '../../utils/tasks'
 import Button from '../Button/Button'
 import './TaskFilters.scss'
 
-interface TaskFiltersProps {
-  value: TaskFilter
-  counts: Record<TaskFilter, number>
-  onChange: (filter: TaskFilter) => void
-}
+function TaskFilters() {
+  const { tasks, pendingKeyByTask, filter: value, setFilter: onChange } = useTaskContext()
+  const { total, completed, active } = countTasks(
+    tasks.filter((task) => !pendingKeyByTask.has(task.id)),
+  )
+  const counts = { all: total, completed, active }
 
-function TaskFilters({ value, counts, onChange }: TaskFiltersProps) {
   return (
     <div className="task-filters" role="group" aria-label="Фільтр завдань">
       {FILTERS.map((filter) => (

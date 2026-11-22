@@ -1,13 +1,12 @@
-import type { Task } from '../../types/task'
+import { useTaskContext } from '../../hooks/useTaskContext'
 import { countTasks } from '../../utils/tasks'
 import './TaskStats.scss'
 
-interface TaskStatsProps {
-  tasks: Task[]
-}
-
-function TaskStats({ tasks }: TaskStatsProps) {
-  const { total, completed, active } = countTasks(tasks)
+function TaskStats() {
+  const { tasks, pendingKeyByTask } = useTaskContext()
+  const { total, completed, active } = countTasks(
+    tasks.filter((task) => !pendingKeyByTask.has(task.id)),
+  )
   const progress = total === 0 ? 0 : Math.round((completed / total) * 100)
 
   const items = [

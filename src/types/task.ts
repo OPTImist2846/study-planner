@@ -12,3 +12,12 @@ export interface Task {
 }
 
 export type TaskDraft = Omit<Task, 'id' | 'completed'>
+
+export type PendingDeletionKind = 'single' | 'completed'
+
+export interface PendingDeletion {
+  key: string
+  kind: PendingDeletionKind
+  taskIds: number[]
+  expiresAt: number
+}

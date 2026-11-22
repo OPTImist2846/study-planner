@@ -16,6 +16,12 @@ export const FILTER_LABELS: Record<TaskFilter, string> = {
 
 export const FILTERS: readonly TaskFilter[] = ['all', 'active', 'completed']
 
+export const UNDO_DELAY_MS = 5000
+
+export function isTaskFilter(value: unknown): value is TaskFilter {
+  return typeof value === 'string' && (FILTERS as readonly string[]).includes(value)
+}
+
 export function nextTaskId(tasks: readonly Task[]): number {
   return tasks.reduce((max, task) => Math.max(max, task.id), 0) + 1
 }
@@ -52,4 +58,20 @@ export function categoryHue(category: string): number {
 export function countTasks(tasks: readonly Task[]) {
   const completed = tasks.filter((task) => task.completed).length
   return { total: tasks.length, completed, active: tasks.length - completed }
+}
+
+export interface VisibleTaskOptions {
+  filter: TaskFilter
+  search: string
+  prioritySort: boolean
+}
+
+export function getVisibleTasks(
+  tasks: readonly Task[],
+  { filter, search, prioritySort }: VisibleTaskOptions,
+): Task[] {
+  const filtered = tasks.filter(
+    (task) => matchesFilter(task, filter) && matchesSearch(task, search),
+  )
+  return prioritySort ? sortByPriority(filtered) : filtered
 }

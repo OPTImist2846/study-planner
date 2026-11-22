@@ -1,24 +1,21 @@
 import { useId } from 'react'
+import { useTaskContext } from '../../hooks/useTaskContext'
 import Button from '../Button/Button'
 import './TaskToolbar.scss'
 
-interface TaskToolbarProps {
-  search: string
-  sortByPriority: boolean
-  completedCount: number
-  onSearchChange: (value: string) => void
-  onSortChange: (value: boolean) => void
-  onClearCompleted: () => void
-}
-
-function TaskToolbar({
-  search,
-  sortByPriority,
-  completedCount,
-  onSearchChange,
-  onSortChange,
-  onClearCompleted,
-}: TaskToolbarProps) {
+function TaskToolbar() {
+  const {
+    tasks,
+    pendingKeyByTask,
+    search,
+    setSearch: onSearchChange,
+    prioritySort: sortByPriority,
+    setPrioritySort: onSortChange,
+    clearCompleted: onClearCompleted,
+  } = useTaskContext()
+  const completedCount = tasks.filter(
+    (task) => task.completed && !pendingKeyByTask.has(task.id),
+  ).length
   const id = useId()
 
   return (

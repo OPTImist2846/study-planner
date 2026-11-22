@@ -1,24 +1,36 @@
-import type { Task } from '../../types/task'
 import type { CSSProperties } from 'react'
+import { useTaskContext } from '../../hooks/useTaskContext'
+import type { Task } from '../../types/task'
 import { PRIORITY_LABELS, categoryHue } from '../../utils/tasks'
 import Button from '../Button/Button'
 import './TaskItem.scss'
 
 interface TaskItemProps {
   task: Task
-  onToggle: (id: number) => void
-  onDelete: (id: number) => void
+  pendingKey: string | null
 }
 
-function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
+function TaskItem({ task, pendingKey }: TaskItemProps) {
+  const { toggleTask, requestDelete, undoDelete } = useTaskContext()
+  const isPending = pendingKey !== null
+
+  const classes = [
+    'task-item',
+    task.completed && 'task-item--completed',
+    isPending && 'task-item--pending',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <li className={`task-item${task.completed ? ' task-item--completed' : ''}`}>
+    <li className={classes}>
       <input
         type="checkbox"
         className="task-item__checkbox"
         checked={task.completed}
+        disabled={isPending}
         aria-label={`Позначити «${task.title}» як виконане`}
-        onChange={() => onToggle(task.id)}
+        onChange={() => toggleTask(task.id)}
       />
       <div className="task-item__body">
         <h3 className="task-item__title">{task.title}</h3>
@@ -33,25 +45,35 @@ function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
           <span className={`task-item__priority task-item__priority--${task.priority}`}>
             {PRIORITY_LABELS[task.priority]}
           </span>
-          <span className="task-item__status">{task.completed ? 'Виконано' : 'Не виконано'}</span>
+          <span className="task-item__status">
+            {isPending ? 'Буде видалено' : task.completed ? 'Виконано' : 'Не виконано'}
+          </span>
         </div>
       </div>
       <div className="task-item__actions">
-        <Button
-          size="small"
-          variant={task.completed ? 'secondary' : 'primary'}
-          onClick={() => onToggle(task.id)}
-        >
-          {task.completed ? 'Повернути' : 'Виконано'}
-        </Button>
-        <Button
-          size="small"
-          variant="danger"
-          aria-label={`Видалити «${task.title}»`}
-          onClick={() => onDelete(task.id)}
-        >
-          Видалити
-        </Button>
+        {isPending ? (
+          <Button size="small" variant="primary" onClick={() => undoDelete(pendingKey)}>
+            Скасувати
+          </Button>
+        ) : (
+          <>
+            <Button
+              size="small"
+              variant={task.completed ? 'secondary' : 'primary'}
+              onClick={() => toggleTask(task.id)}
+            >
+              {task.completed ? 'Повернути' : 'Виконано'}
+            </Button>
+            <Button
+              size="small"
+              variant="danger"
+              aria-label={`Видалити «${task.title}»`}
+              onClick={() => requestDelete(task.id)}
+            >
+              Видалити
+            </Button>
+          </>
+        )}
       </div>
     </li>
   )
