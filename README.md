@@ -1,32 +1,62 @@
-# React + TypeScript + Vite
+# Study Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Планувальник навчальних завдань на React 19 + TypeScript + Vite. Стилі — SCSS за методологією BEM.
 
-Currently, two official plugins are available:
+- Лабораторна робота №8 — компоненти, JSX, props, `useState`, події, списки та умовний рендеринг (гілка `feature/react-fundamentals`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Можливості
 
-## React Compiler
+- список завдань з назвою, описом, категорією, пріоритетом і станом виконання
+- додавання завдання; назва обов'язкова, після додавання форма очищується
+- позначення виконаним і повернення в стан «не виконано», видалення
+- фільтри «Всі», «Не виконані», «Виконані» з лічильниками та виділенням активного
+- статистика: всього, виконано, не виконано та прогрес
+- окремі повідомлення для порожнього списку та для порожнього результату фільтра
+- пошук за назвою, сортування за пріоритетом, кнопка «Очистити виконані»
+- темна тема та автоматичні кольори категорій
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Компоненти
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+App
+├── Header          перемикач теми
+├── TaskForm        форма нового завдання
+├── TaskStats       статистика й прогрес
+├── TaskFilters     фільтр за станом
+├── TaskToolbar     пошук, сортування, очищення виконаних
+└── TaskList
+    └── TaskItem
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+`App` зберігає `tasks`, `filter`, `search`, `prioritySort` і тему в `useState` та передає дані дочірнім компонентам через props, а зміни отримує через callback-функції. Оновлення масиву завдань незмінні (`map`, `filter`, spread). Відфільтрований список і статистика обчислюються під час рендеру і не зберігаються в окремому state.
+
+## Структура
+
+```
+src/
+├── components/   кожен компонент у власній теці з .tsx та .scss
+├── data/         initialTasks.ts
+├── styles/       global.scss (змінні, reset, базові стилі)
+├── types/        task.ts
+├── utils/        tasks.ts (фільтрація, підрахунок, сортування)
+├── App.tsx
+└── main.tsx
+```
+
+## Запуск
+
+Потрібен Node.js 22.22 або новіший.
+
+```sh
+npm install
+npm run dev
+```
+
+| Команда              | Опис                                |
+| -------------------- | ----------------------------------- |
+| `npm run dev`        | dev-сервер                          |
+| `npm run build`      | перевірка типів і production-збірка |
+| `npm run type-check` | лише перевірка типів                |
+| `npm run lint`       | ESLint                              |
+| `npm run format`     | Prettier                            |
+| `npm run preview`    | перегляд зібраної версії            |
