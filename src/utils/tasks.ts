@@ -86,6 +86,10 @@ export function categoryHue(category: string): number {
   return hash
 }
 
+export function getCategories(tasks: readonly Task[]): string[] {
+  return [...new Set(tasks.map((task) => task.category))].sort((a, b) => a.localeCompare(b))
+}
+
 export function countTasks(tasks: readonly Task[]) {
   const completed = tasks.filter((task) => task.completed).length
   return { total: tasks.length, completed, active: tasks.length - completed }

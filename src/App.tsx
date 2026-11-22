@@ -7,13 +7,14 @@ import TaskStats from './components/TaskStats/TaskStats'
 import TaskToolbar from './components/TaskToolbar/TaskToolbar'
 import ToastViewport from './components/Toast/ToastViewport'
 import { useTaskContext } from './hooks/useTaskContext'
+import { getCategories } from './utils/tasks'
 import './App.scss'
 
 function App() {
   const { tasks, addTask } = useTaskContext()
   const [isDark, setIsDark] = useState(false)
 
-  const categories = [...new Set(tasks.map((task) => task.category))].sort()
+  const categories = getCategories(tasks)
 
   return (
     <div className={`app${isDark ? ' app--dark' : ''}`}>

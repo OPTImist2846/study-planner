@@ -1,8 +1,9 @@
-import type { CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useTaskContext } from '../../hooks/useTaskContext'
 import type { Task } from '../../types/task'
-import { PRIORITY_LABELS, categoryHue } from '../../utils/tasks'
+import { PRIORITY_LABELS, categoryHue, getCategories } from '../../utils/tasks'
 import Button from '../Button/Button'
+import TaskForm from '../TaskForm/TaskForm'
 import './TaskItem.scss'
 
 interface TaskItemProps {
@@ -11,8 +12,26 @@ interface TaskItemProps {
 }
 
 function TaskItem({ task, pendingKey }: TaskItemProps) {
-  const { toggleTask, requestDelete, undoDelete } = useTaskContext()
+  const { tasks, toggleTask, updateTask, requestDelete, undoDelete } = useTaskContext()
+  const [isEditing, setIsEditing] = useState(false)
   const isPending = pendingKey !== null
+
+  if (isEditing && !isPending) {
+    const { title, description, category, priority } = task
+    return (
+      <li className="task-item task-item--editing">
+        <TaskForm
+          categories={getCategories(tasks)}
+          initial={{ title, description, category, priority }}
+          onSubmit={(changes) => {
+            updateTask(task.id, changes)
+            setIsEditing(false)
+          }}
+          onCancel={() => setIsEditing(false)}
+        />
+      </li>
+    )
+  }
 
   const classes = [
     'task-item',
@@ -63,6 +82,9 @@ function TaskItem({ task, pendingKey }: TaskItemProps) {
               onClick={() => toggleTask(task.id)}
             >
               {task.completed ? 'Повернути' : 'Виконано'}
+            </Button>
+            <Button size="small" variant="secondary" onClick={() => setIsEditing(true)}>
+              Редагувати
             </Button>
             <Button
               size="small"

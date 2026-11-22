@@ -17,6 +17,11 @@
     opacity: 0.7;
   }
 
+  &--editing {
+    display: block;
+    border-left-color: var(--color-primary);
+  }
+
   &--pending {
     border-left-color: var(--color-danger);
     border-style: dashed;

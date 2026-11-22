@@ -7,6 +7,8 @@ import './TaskForm.scss'
 interface TaskFormProps {
   categories: string[]
   onSubmit: (draft: TaskDraft) => void
+  initial?: TaskDraft
+  onCancel?: () => void
 }
 
 const EMPTY_DRAFT: TaskDraft = {
@@ -18,8 +20,9 @@ const EMPTY_DRAFT: TaskDraft = {
 
 const DEFAULT_CATEGORY = 'Загальне'
 
-function TaskForm({ categories, onSubmit }: TaskFormProps) {
-  const [draft, setDraft] = useState<TaskDraft>(EMPTY_DRAFT)
+function TaskForm({ categories, onSubmit, initial, onCancel }: TaskFormProps) {
+  const isEdit = initial !== undefined
+  const [draft, setDraft] = useState<TaskDraft>(initial ?? EMPTY_DRAFT)
   const [error, setError] = useState<string | null>(null)
   const id = useId()
 
@@ -41,13 +44,21 @@ function TaskForm({ categories, onSubmit }: TaskFormProps) {
       category: draft.category.trim() || DEFAULT_CATEGORY,
       priority: draft.priority,
     })
-    setDraft(EMPTY_DRAFT)
+    if (!isEdit) setDraft(EMPTY_DRAFT)
     setError(null)
   }
 
   return (
-    <form className="task-form" noValidate onSubmit={handleSubmit}>
-      <h2 className="task-form__title">Нове завдання</h2>
+    <form
+      className={`task-form${isEdit ? ' task-form--edit' : ''}`}
+      noValidate
+      aria-label={isEdit ? 'Редагування завдання' : undefined}
+      onSubmit={handleSubmit}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && onCancel) onCancel()
+      }}
+    >
+      {!isEdit && <h2 className="task-form__title">Нове завдання</h2>}
 
       <div className="task-form__grid">
         <div className="task-form__field task-form__field--wide">
@@ -123,8 +134,13 @@ function TaskForm({ categories, onSubmit }: TaskFormProps) {
       </div>
 
       <div className="task-form__actions">
+        {onCancel && (
+          <Button variant="ghost" onClick={onCancel}>
+            Скасувати
+          </Button>
+        )}
         <Button type="submit" variant="primary">
-          Додати
+          {isEdit ? 'Зберегти' : 'Додати'}
         </Button>
       </div>
     </form>

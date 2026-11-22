@@ -5,6 +5,13 @@
   background-color: var(--color-surface);
   box-shadow: var(--shadow);
 
+  &--edit {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
   &__title {
     margin-bottom: 0.75rem;
     font-size: 1.125rem;
@@ -64,6 +71,7 @@
   &__actions {
     display: flex;
     justify-content: flex-end;
+    gap: 0.5rem;
     margin-top: 0.75rem;
   }
 
