@@ -4,9 +4,10 @@ import TaskFilters from './components/TaskFilters/TaskFilters'
 import TaskForm from './components/TaskForm/TaskForm'
 import TaskList from './components/TaskList/TaskList'
 import TaskStats from './components/TaskStats/TaskStats'
+import TaskToolbar from './components/TaskToolbar/TaskToolbar'
 import { initialTasks } from './data/initialTasks'
 import type { Task, TaskDraft, TaskFilter } from './types/task'
-import { countTasks, createTask, matchesFilter } from './utils/tasks'
+import { countTasks, createTask, matchesFilter, matchesSearch, sortByPriority } from './utils/tasks'
 import './App.scss'
 
 function App() {
@@ -14,7 +15,13 @@ function App() {
 
   const [filter, setFilter] = useState<TaskFilter>('all')
 
-  const visibleTasks = tasks.filter((task) => matchesFilter(task, filter))
+  const [search, setSearch] = useState('')
+  const [prioritySort, setPrioritySort] = useState(false)
+
+  const filteredTasks = tasks.filter(
+    (task) => matchesFilter(task, filter) && matchesSearch(task, search),
+  )
+  const visibleTasks = prioritySort ? sortByPriority(filteredTasks) : filteredTasks
   const { total, completed, active } = countTasks(tasks)
   const categories = [...new Set(tasks.map((task) => task.category))].sort()
 
@@ -32,6 +39,10 @@ function App() {
     setTasks((previous) => previous.filter((task) => task.id !== id))
   }
 
+  function clearCompleted() {
+    setTasks((previous) => previous.filter((task) => !task.completed))
+  }
+
   return (
     <div className="app">
       <div className="app__container">
@@ -47,6 +58,14 @@ function App() {
               value={filter}
               counts={{ all: total, completed, active }}
               onChange={setFilter}
+            />
+            <TaskToolbar
+              search={search}
+              sortByPriority={prioritySort}
+              completedCount={completed}
+              onSearchChange={setSearch}
+              onSortChange={setPrioritySort}
+              onClearCompleted={clearCompleted}
             />
             <TaskList
               tasks={visibleTasks}

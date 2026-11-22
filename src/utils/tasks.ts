@@ -30,6 +30,17 @@ export function matchesFilter(task: Task, filter: TaskFilter): boolean {
   return true
 }
 
+const PRIORITY_WEIGHT: Record<TaskPriority, number> = { high: 0, medium: 1, low: 2 }
+
+export function matchesSearch(task: Task, query: string): boolean {
+  const needle = query.trim().toLocaleLowerCase()
+  return needle === '' || task.title.toLocaleLowerCase().includes(needle)
+}
+
+export function sortByPriority(tasks: readonly Task[]): Task[] {
+  return [...tasks].sort((a, b) => PRIORITY_WEIGHT[a.priority] - PRIORITY_WEIGHT[b.priority])
+}
+
 export function countTasks(tasks: readonly Task[]) {
   const completed = tasks.filter((task) => task.completed).length
   return { total: tasks.length, completed, active: tasks.length - completed }
