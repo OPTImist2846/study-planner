@@ -15,6 +15,7 @@ function App() {
 
   const [filter, setFilter] = useState<TaskFilter>('all')
 
+  const [isDark, setIsDark] = useState(false)
   const [search, setSearch] = useState('')
   const [prioritySort, setPrioritySort] = useState(false)
 
@@ -44,9 +45,9 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app${isDark ? ' app--dark' : ''}`}>
       <div className="app__container">
-        <Header />
+        <Header isDark={isDark} onToggleTheme={() => setIsDark((previous) => !previous)} />
         <main className="app__main">
           <TaskForm categories={categories} onAdd={addTask} />
           <TaskStats tasks={tasks} />

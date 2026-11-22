@@ -41,6 +41,14 @@ export function sortByPriority(tasks: readonly Task[]): Task[] {
   return [...tasks].sort((a, b) => PRIORITY_WEIGHT[a.priority] - PRIORITY_WEIGHT[b.priority])
 }
 
+export function categoryHue(category: string): number {
+  let hash = 0
+  for (const char of category.toLocaleLowerCase()) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 360
+  }
+  return hash
+}
+
 export function countTasks(tasks: readonly Task[]) {
   const completed = tasks.filter((task) => task.completed).length
   return { total: tasks.length, completed, active: tasks.length - completed }

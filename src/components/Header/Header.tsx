@@ -1,6 +1,12 @@
+import Button from '../Button/Button'
 import './Header.scss'
 
-function Header() {
+interface HeaderProps {
+  isDark: boolean
+  onToggleTheme: () => void
+}
+
+function Header({ isDark, onToggleTheme }: HeaderProps) {
   return (
     <header className="header">
       <div className="header__brand">
@@ -12,6 +18,9 @@ function Header() {
           <p className="header__subtitle">Планувальник навчальних завдань</p>
         </div>
       </div>
+      <Button size="small" aria-pressed={isDark} onClick={onToggleTheme}>
+        {isDark ? 'Світла тема' : 'Темна тема'}
+      </Button>
     </header>
   )
 }

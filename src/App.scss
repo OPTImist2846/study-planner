@@ -3,6 +3,23 @@
   color: var(--color-text);
   background-color: var(--color-bg);
 
+  &--dark {
+    --color-bg: #11141c;
+    --color-surface: #1b202b;
+    --color-border: #2c3341;
+    --color-text: #e6e9f0;
+    --color-muted: #9aa3b5;
+    --color-primary: #7d93ff;
+    --color-primary-contrast: #0d1020;
+    --color-danger: #ff7a7a;
+    --color-success: #4cc89a;
+    --shadow: 0 1px 3px rgb(0 0 0 / 40%);
+    --category-lightness: 75%;
+    --category-background: 30%;
+
+    color-scheme: dark;
+  }
+
   &__container {
     width: 100%;
     max-width: 48rem;

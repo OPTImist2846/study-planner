@@ -71,8 +71,8 @@
   }
 
   &__category {
-    color: var(--color-primary);
-    background-color: var(--color-bg);
+    color: hsl(var(--category-hue, 230) 60% var(--category-lightness));
+    background-color: hsl(var(--category-hue, 230) 70% var(--category-background) / 35%);
   }
 
   &__priority {
