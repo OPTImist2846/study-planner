@@ -12,6 +12,7 @@ function TaskToolbar() {
     prioritySort: sortByPriority,
     setPrioritySort: onSortChange,
     clearCompleted: onClearCompleted,
+    resetTasks,
   } = useTaskContext()
   const completedCount = tasks.filter(
     (task) => task.completed && !pendingKeyByTask.has(task.id),
@@ -47,6 +48,9 @@ function TaskToolbar() {
         onClick={onClearCompleted}
       >
         Очистити виконані
+      </Button>
+      <Button size="small" variant="ghost" onClick={resetTasks}>
+        Скинути дані
       </Button>
     </div>
   )
