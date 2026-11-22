@@ -1,0 +1,75 @@
+.task-form {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow);
+
+  &__title {
+    margin-bottom: 0.75rem;
+    font-size: 1.125rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    &--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__required {
+    color: var(--color-danger);
+  }
+
+  &__control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: var(--color-bg);
+
+    &:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -1px;
+    }
+
+    &--textarea {
+      resize: vertical;
+    }
+
+    &--invalid {
+      border-color: var(--color-danger);
+    }
+  }
+
+  &__error {
+    font-size: 0.8125rem;
+    color: var(--color-danger);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+  }
+
+  @media (width <= 32rem) {
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
