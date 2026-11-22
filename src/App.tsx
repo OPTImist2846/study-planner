@@ -1,16 +1,21 @@
 import { useState } from 'react'
 import Header from './components/Header/Header'
+import TaskFilters from './components/TaskFilters/TaskFilters'
 import TaskForm from './components/TaskForm/TaskForm'
 import TaskList from './components/TaskList/TaskList'
 import TaskStats from './components/TaskStats/TaskStats'
 import { initialTasks } from './data/initialTasks'
-import type { Task, TaskDraft } from './types/task'
-import { createTask } from './utils/tasks'
+import type { Task, TaskDraft, TaskFilter } from './types/task'
+import { countTasks, createTask, matchesFilter } from './utils/tasks'
 import './App.scss'
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
 
+  const [filter, setFilter] = useState<TaskFilter>('all')
+
+  const visibleTasks = tasks.filter((task) => matchesFilter(task, filter))
+  const { total, completed, active } = countTasks(tasks)
   const categories = [...new Set(tasks.map((task) => task.category))].sort()
 
   function addTask(draft: TaskDraft) {
@@ -38,7 +43,17 @@ function App() {
             <h2 id="tasks-title" className="app__section-title">
               Завдання
             </h2>
-            <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask} />
+            <TaskFilters
+              value={filter}
+              counts={{ all: total, completed, active }}
+              onChange={setFilter}
+            />
+            <TaskList
+              tasks={visibleTasks}
+              totalCount={tasks.length}
+              onToggle={toggleTask}
+              onDelete={deleteTask}
+            />
           </section>
         </main>
       </div>
