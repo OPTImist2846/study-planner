@@ -1,0 +1,63 @@
+:root {
+  --color-bg: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-border: #dfe3ec;
+  --color-text: #1f2533;
+  --color-muted: #6b7385;
+  --color-primary: #4f6bed;
+  --color-primary-contrast: #ffffff;
+  --color-danger: #d64545;
+  --color-success: #2f9e6e;
+  --radius: 0.5rem;
+  --shadow: 0 1px 3px rgb(31 37 51 / 8%);
+
+  color-scheme: light;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
