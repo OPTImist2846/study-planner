@@ -5,6 +5,7 @@ import TaskForm from './components/TaskForm/TaskForm'
 import TaskList from './components/TaskList/TaskList'
 import TaskStats from './components/TaskStats/TaskStats'
 import TaskToolbar from './components/TaskToolbar/TaskToolbar'
+import ToastViewport from './components/Toast/ToastViewport'
 import { useTaskContext } from './hooks/useTaskContext'
 import './App.scss'
 
@@ -31,6 +32,7 @@ function App() {
           </section>
         </main>
       </div>
+      <ToastViewport />
     </div>
   )
 }

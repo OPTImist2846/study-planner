@@ -10,10 +10,10 @@ export type TaskAction =
   | { type: 'add'; draft: TaskDraft }
   | { type: 'toggle'; id: number }
   | { type: 'update'; id: number; changes: TaskDraft }
-  | { type: 'requestDelete'; key: string; id: number; expiresAt: number }
+  | { type: 'requestDelete'; key: string; id: number; startedAt: number; expiresAt: number }
   | { type: 'confirmDelete'; key: string }
   | { type: 'undoDelete'; key: string }
-  | { type: 'clearCompleted'; key: string; expiresAt: number }
+  | { type: 'clearCompleted'; key: string; startedAt: number; expiresAt: number }
   | { type: 'reset'; tasks: Task[] }
   | { type: 'sync'; tasks: Task[] }
 
@@ -50,7 +50,13 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         pending: [
           ...state.pending,
-          { key: action.key, kind: 'single', taskIds: [action.id], expiresAt: action.expiresAt },
+          {
+            key: action.key,
+            kind: 'single',
+            taskIds: [action.id],
+            startedAt: action.startedAt,
+            expiresAt: action.expiresAt,
+          },
         ],
       }
     }
@@ -65,7 +71,13 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         pending: [
           ...state.pending,
-          { key: action.key, kind: 'completed', taskIds, expiresAt: action.expiresAt },
+          {
+            key: action.key,
+            kind: 'completed',
+            taskIds,
+            startedAt: action.startedAt,
+            expiresAt: action.expiresAt,
+          },
         ],
       }
     }

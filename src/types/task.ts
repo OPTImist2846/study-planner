@@ -19,5 +19,14 @@ export interface PendingDeletion {
   key: string
   kind: PendingDeletionKind
   taskIds: number[]
+  startedAt: number
   expiresAt: number
+}
+
+export type ToastVariant = 'success' | 'error' | 'info'
+
+export interface ToastMessage {
+  id: number
+  message: string
+  variant: ToastVariant
 }

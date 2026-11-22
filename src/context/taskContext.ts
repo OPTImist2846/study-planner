@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { PendingDeletion, Task, TaskDraft, TaskFilter } from '../types/task'
+import type { PendingDeletion, Task, TaskDraft, TaskFilter, ToastMessage } from '../types/task'
 
 export interface TaskContextValue {
   tasks: Task[]
@@ -18,6 +18,8 @@ export interface TaskContextValue {
   undoDelete: (key: string) => void
   clearCompleted: () => void
   resetTasks: () => void
+  toasts: ToastMessage[]
+  dismissToast: (id: number) => void
 }
 
 export const TaskContext = createContext<TaskContextValue | null>(null)
