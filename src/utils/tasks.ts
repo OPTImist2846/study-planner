@@ -18,6 +18,37 @@ export const FILTERS: readonly TaskFilter[] = ['all', 'active', 'completed']
 
 export const UNDO_DELAY_MS = 5000
 
+const PRIORITY_VALUES: readonly string[] = ['low', 'medium', 'high']
+
+export function isTask(value: unknown): value is Task {
+  if (typeof value !== 'object' || value === null) return false
+  const task = value as Record<string, unknown>
+  return (
+    typeof task.id === 'number' &&
+    Number.isInteger(task.id) &&
+    typeof task.title === 'string' &&
+    task.title.trim() !== '' &&
+    typeof task.description === 'string' &&
+    typeof task.completed === 'boolean' &&
+    typeof task.priority === 'string' &&
+    PRIORITY_VALUES.includes(task.priority) &&
+    typeof task.category === 'string'
+  )
+}
+
+export function isTaskList(value: unknown): value is Task[] {
+  return (
+    Array.isArray(value) &&
+    value.every(isTask) &&
+    new Set(value.map((task) => task.id)).size === value.length
+  )
+}
+
+export function activeTaskTitle(activeCount: number): string {
+  const noun = activeCount === 1 ? 'active task' : 'active tasks'
+  return `Study Planner — ${activeCount} ${noun}`
+}
+
 export function isTaskFilter(value: unknown): value is TaskFilter {
   return typeof value === 'string' && (FILTERS as readonly string[]).includes(value)
 }

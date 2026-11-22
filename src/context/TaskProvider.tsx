@@ -3,13 +3,15 @@ import { initialTasks } from '../data/initialTasks'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { taskReducer, type TaskState } from '../reducers/taskReducer'
 import type { TaskDraft, TaskFilter } from '../types/task'
-import { UNDO_DELAY_MS, isTaskFilter } from '../utils/tasks'
+import { readStorage, writeStorage } from '../utils/storage'
+import { UNDO_DELAY_MS, activeTaskTitle, isTaskFilter, isTaskList } from '../utils/tasks'
 import { TaskContext, type TaskContextValue } from './taskContext'
 
+const TASKS_STORAGE_KEY = 'study-planner:tasks'
 const FILTER_STORAGE_KEY = 'study-planner:filter'
 
 function createInitialState(): TaskState {
-  return { tasks: initialTasks, pending: [] }
+  return { tasks: readStorage(TASKS_STORAGE_KEY, isTaskList) ?? initialTasks, pending: [] }
 }
 
 function createKey(): string {
@@ -25,6 +27,18 @@ function TaskProvider({ children }: TaskProviderProps) {
   const [filter, setFilter] = useLocalStorage<TaskFilter>(FILTER_STORAGE_KEY, 'all', isTaskFilter)
   const [search, setSearch] = useState('')
   const [prioritySort, setPrioritySort] = useState(false)
+
+  useEffect(() => {
+    writeStorage(TASKS_STORAGE_KEY, state.tasks)
+  }, [state.tasks])
+
+  const activeCount = state.tasks.filter(
+    (task) => !task.completed && !state.pending.some((entry) => entry.taskIds.includes(task.id)),
+  ).length
+
+  useEffect(() => {
+    document.title = activeTaskTitle(activeCount)
+  }, [activeCount])
 
   const expireDeletion = useEffectEvent((key: string) => {
     dispatch({ type: 'confirmDelete', key })
