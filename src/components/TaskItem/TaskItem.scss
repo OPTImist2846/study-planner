@@ -17,6 +17,21 @@
     opacity: 0.7;
   }
 
+  &__checkbox {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.125rem;
+    accent-color: var(--color-success);
+    cursor: pointer;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
   &__body {
     flex-grow: 1;
     min-width: 0;

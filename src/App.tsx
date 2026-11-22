@@ -17,6 +17,16 @@ function App() {
     setTasks((previous) => [createTask(previous, draft), ...previous])
   }
 
+  function toggleTask(id: number) {
+    setTasks((previous) =>
+      previous.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)),
+    )
+  }
+
+  function deleteTask(id: number) {
+    setTasks((previous) => previous.filter((task) => task.id !== id))
+  }
+
   return (
     <div className="app">
       <div className="app__container">
@@ -28,7 +38,7 @@ function App() {
             <h2 id="tasks-title" className="app__section-title">
               Завдання
             </h2>
-            <TaskList tasks={tasks} />
+            <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask} />
           </section>
         </main>
       </div>
