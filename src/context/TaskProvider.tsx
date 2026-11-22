@@ -1,4 +1,13 @@
-import { useEffect, useEffectEvent, useReducer, useState, type ReactNode } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { initialTasks } from '../data/initialTasks'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useToasts } from '../hooks/useToasts'
@@ -31,7 +40,11 @@ function TaskProvider({ children }: TaskProviderProps) {
   const [prioritySort, setPrioritySort] = useState(false)
   const { toasts, showToast, dismissToast } = useToasts()
 
-  const pendingIds = pendingTaskIds(state.pending)
+  const stateRef = useRef(state)
+
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   const reportSaveError = useEffectEvent(() => {
     showToast('Не вдалося зберегти завдання в браузері.', 'error')
@@ -40,6 +53,18 @@ function TaskProvider({ children }: TaskProviderProps) {
   useEffect(() => {
     if (!writeStorage(TASKS_STORAGE_KEY, state.tasks)) reportSaveError()
   }, [state.tasks])
+
+  useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      if (event.key !== TASKS_STORAGE_KEY) return
+      const tasks = readStorage(TASKS_STORAGE_KEY, isTaskList)
+      if (tasks) dispatch({ type: 'sync', tasks })
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  const pendingIds = useMemo(() => pendingTaskIds(state.pending), [state.pending])
 
   const activeCount = state.tasks.filter(
     (task) => !task.completed && !pendingIds.has(task.id),
@@ -68,79 +93,125 @@ function TaskProvider({ children }: TaskProviderProps) {
     return () => timers.forEach((timer) => window.clearTimeout(timer))
   }, [state.pending])
 
-  const pendingKeyByTask = new Map(
-    state.pending.flatMap((entry) => entry.taskIds.map((id) => [id, entry.key] as const)),
+  const pendingKeyByTask = useMemo(
+    () =>
+      new Map(
+        state.pending.flatMap((entry) => entry.taskIds.map((id) => [id, entry.key] as const)),
+      ),
+    [state.pending],
   )
 
-  function addTask(draft: TaskDraft) {
-    dispatch({ type: 'add', draft })
-    showToast(`Завдання «${draft.title}» додано.`)
-  }
+  const isPending = useCallback(
+    (id: number) => pendingTaskIds(stateRef.current.pending).has(id),
+    [],
+  )
 
-  function updateTask(id: number, changes: TaskDraft) {
-    if (!state.tasks.some((task) => task.id === id)) {
-      showToast('Завдання не знайдено, зміни не збережено.', 'error')
-      return
-    }
-    dispatch({ type: 'update', id, changes })
-    showToast(`Завдання «${changes.title}» оновлено.`)
-  }
+  const addTask = useCallback(
+    (draft: TaskDraft) => {
+      dispatch({ type: 'add', draft })
+      showToast(`Завдання «${draft.title}» додано.`)
+    },
+    [showToast],
+  )
 
-  function toggleTask(id: number) {
-    if (pendingIds.has(id)) {
-      showToast('Завдання очікує видалення, його не можна змінити.', 'error')
-      return
-    }
-    dispatch({ type: 'toggle', id })
-  }
+  const updateTask = useCallback(
+    (id: number, changes: TaskDraft) => {
+      if (!stateRef.current.tasks.some((task) => task.id === id)) {
+        showToast('Завдання не знайдено, зміни не збережено.', 'error')
+        return
+      }
+      dispatch({ type: 'update', id, changes })
+      showToast(`Завдання «${changes.title}» оновлено.`)
+    },
+    [showToast],
+  )
 
-  function requestDelete(id: number) {
-    if (pendingIds.has(id)) {
-      showToast('Це завдання вже очікує видалення.', 'error')
-      return
-    }
-    dispatch({ type: 'requestDelete', id, ...createDeletionTiming() })
-  }
+  const toggleTask = useCallback(
+    (id: number) => {
+      if (isPending(id)) {
+        showToast('Завдання очікує видалення, його не можна змінити.', 'error')
+        return
+      }
+      dispatch({ type: 'toggle', id })
+    },
+    [isPending, showToast],
+  )
 
-  function undoDelete(key: string) {
-    dispatch({ type: 'undoDelete', key })
-    showToast('Видалення скасовано.', 'info')
-  }
+  const requestDelete = useCallback(
+    (id: number) => {
+      if (isPending(id)) {
+        showToast('Це завдання вже очікує видалення.', 'error')
+        return
+      }
+      dispatch({ type: 'requestDelete', id, ...createDeletionTiming() })
+    },
+    [isPending, showToast],
+  )
 
-  function clearCompleted() {
-    const hasCompleted = state.tasks.some((task) => task.completed && !pendingIds.has(task.id))
+  const undoDelete = useCallback(
+    (key: string) => {
+      dispatch({ type: 'undoDelete', key })
+      showToast('Видалення скасовано.', 'info')
+    },
+    [showToast],
+  )
+
+  const clearCompleted = useCallback(() => {
+    const hasCompleted = stateRef.current.tasks.some(
+      (task) => task.completed && !isPending(task.id),
+    )
     if (!hasCompleted) {
       showToast('Немає виконаних завдань для очищення.', 'error')
       return
     }
     dispatch({ type: 'clearCompleted', ...createDeletionTiming() })
-  }
+  }, [isPending, showToast])
 
-  function resetTasks() {
+  const resetTasks = useCallback(() => {
     dispatch({ type: 'reset', tasks: initialTasks })
     showToast('Дані скинуто до початкового списку.', 'info')
-  }
+  }, [showToast])
 
-  const value: TaskContextValue = {
-    tasks: state.tasks,
-    pending: state.pending,
-    pendingKeyByTask,
-    filter,
-    setFilter,
-    search,
-    setSearch,
-    prioritySort,
-    setPrioritySort,
-    addTask,
-    updateTask,
-    toggleTask,
-    requestDelete,
-    undoDelete,
-    clearCompleted,
-    resetTasks,
-    toasts,
-    dismissToast,
-  }
+  const value = useMemo<TaskContextValue>(
+    () => ({
+      tasks: state.tasks,
+      pending: state.pending,
+      pendingKeyByTask,
+      filter,
+      setFilter,
+      search,
+      setSearch,
+      prioritySort,
+      setPrioritySort,
+      addTask,
+      updateTask,
+      toggleTask,
+      requestDelete,
+      undoDelete,
+      clearCompleted,
+      resetTasks,
+      toasts,
+      dismissToast,
+    }),
+    [
+      state.tasks,
+      state.pending,
+      pendingKeyByTask,
+      filter,
+      setFilter,
+      search,
+      prioritySort,
+      addTask,
+      updateTask,
+      toggleTask,
+      requestDelete,
+      undoDelete,
+      clearCompleted,
+      resetTasks,
+      toasts,
+      dismissToast,
+    ],
+  )
 
   return <TaskContext value={value}>{children}</TaskContext>
 }

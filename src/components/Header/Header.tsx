@@ -1,12 +1,11 @@
+import { useTheme } from '../../hooks/useTheme'
 import Button from '../Button/Button'
 import './Header.scss'
 
-interface HeaderProps {
-  isDark: boolean
-  onToggleTheme: () => void
-}
+function Header() {
+  const { theme, toggleTheme: onToggleTheme } = useTheme()
+  const isDark = theme === 'dark'
 
-function Header({ isDark, onToggleTheme }: HeaderProps) {
   return (
     <header className="header">
       <div className="header__brand">

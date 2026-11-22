@@ -12,5 +12,15 @@ export function useLocalStorage<T>(
     writeStorage(key, value)
   }, [key, value])
 
+  useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      if (event.key !== key || event.newValue === null) return
+      const next = readStorage(key, isValid)
+      if (next !== null) setValue(next)
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [key, isValid])
+
   return [value, setValue]
 }
